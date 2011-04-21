@@ -1,0 +1,12 @@
+struct FileRequester * __AllocFileRequest(__reg("a6") void *)="\tjsr\t-30(a6)";
+#define AllocFileRequest() __AllocFileRequest(AslBase)
+void  __FreeFileRequest(__reg("a0") struct FileRequester *fileReq ,__reg("a6") void *)="\tjsr\t-36(a6)";
+#define FreeFileRequest(x1) __FreeFileRequest((x1),AslBase)
+BOOL  __RequestFile(__reg("a0") struct FileRequester *fileReq ,__reg("a6") void *)="\tjsr\t-42(a6)";
+#define RequestFile(x1) __RequestFile((x1),AslBase)
+APTR  __AllocAslRequest(__reg("d0") unsigned long reqType,__reg("a0") struct TagItem *tagList ,__reg("a6") void *)="\tjsr\t-48(a6)";
+#define AllocAslRequest(x1,x2) __AllocAslRequest((x1),(x2),AslBase)
+void  __FreeAslRequest(__reg("a0") APTR requester ,__reg("a6") void *)="\tjsr\t-54(a6)";
+#define FreeAslRequest(x1) __FreeAslRequest((x1),AslBase)
+BOOL  __AslRequest(__reg("a0") APTR requester,__reg("a1") struct TagItem *tagList ,__reg("a6") void *)="\tjsr\t-60(a6)";
+#define AslRequest(x1,x2) __AslRequest((x1),(x2),AslBase)

@@ -1,0 +1,71 @@
+#
+#	$Id: Smake.template,v 3.5 1996/03/26 07:43:31 jraja Exp $
+#
+#	Smakefile template for simple AmiTCP/IP utilities
+#
+#       Copyright © 1994 AmiTCP/IP Group, 
+#                        Network Solutions Development Inc.
+#                        All rights reserved.
+#
+
+
+CC=      sc
+LD=      sc
+MAKE=    smake
+TAGS=    etags
+RM=      delete quiet
+MKDIR=   makedir
+#INSTALL= copy nopro dates all
+INSTALL= slink stripdebug noicons
+RCSREV=  rcsrev prefix=AmiTCP/IP_
+CAT=     type 
+
+DEST=    AmiTCP-Dest:
+
+CFLAGS = Optimize Debug=line $(CFLAGS)
+LDFLAGS= NoIcons $(LDFLAGS)
+
+# DEF=RCS_ID_C=static char *rcsid
+DEFS=    DEF=RCS_ID_C=//  DEF=AMIGA=1 $(DEFS)
+IDIRS=   IDIR=netinclude: $(IDIRS)
+SCOPTIONS= stringmerge structureequivalence \
+	 nostackcheck nomultipleincludes \
+	 noerrorsource noversion noerrorhighlight \
+	 smallcode smalldata \
+	 map maphunk mapsymbols maplib mapxreference \
+	 linkeroptions=plain noicons batch \
+	 optinl opttime optcomp=5 optdep=5 optrdep=5 \
+	 $(IDIRS) $(DEFS) $(SCOPTIONS)
+
+
+all: $(PROG)
+
+$(PROG): SCOPTIONS $(OBJS)
+	$(LD) $(LDFLAGS) LINK BATCH TO $@ FROM $(OBJS) $(LIBS) 
+
+.c.o:
+	-@$(RM) $*.o  > nil:
+	$(CC) $(CFLAGS) $*.c
+
+$(PROG)_rev.h: $(PROG).c
+	-$(RCSREV) $(PROG) $(PROG).c
+
+SCOPTIONS: Smake.def
+	copy to $@ <from < 
+$(SCOPTIONS)
+<
+
+install: all $(DEST)bin
+	$(INSTALL) from $(PROG) to $(DEST)bin/$(PROG)
+
+$(DEST)bin:
+	-$(MKDIR) $@
+
+TAGS:	$(SRCS)
+	$(TAGS) $(SRCS)
+
+clean:
+	-$(RM) \#?(_rev.?|.o|.map|.lnk|.info) SCOPTIONS
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+$(PROG).o: $(PROG).c $(PROG)_rev.h
