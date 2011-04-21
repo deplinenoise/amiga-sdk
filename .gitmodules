@@ -1,0 +1,9 @@
+[submodule "vbcc"]
+	path = vbcc
+	url = git@github.com:deplinenoise/vbcc.git
+[submodule "vasm"]
+	path = vasm
+	url = git@github.com:deplinenoise/vasm.git
+[submodule "vlink"]
+	path = vlink
+	url = git@github.com:deplinenoise/vlink.git
