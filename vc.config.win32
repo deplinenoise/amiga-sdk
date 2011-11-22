@@ -1,0 +1,16 @@
+-cc=%%VBCC%%\bin\win32\vbccm68k -D__AMIGA__ -D__VBCC__ -quiet %s -o= %s %s -O=%ld -I"%%VBCC%%\include\sdk" -I"%%VBCC%%\include\net"
+-ccv=%%VBCC%%\bin\win32\vbccm68k -D__AMIGA__ -D__VBCC__ %s -o= %s %s -O=%ld -I"%%VBCC%%\include\sdk" -I"%%VBCC%%\include\net"
+-as=%%VBCC%%\bin\win32\vasmm68k_mot -quiet -Fhunk -phxass %s -o %s -I"%%VBCC%%\include\sdk"
+-asv=%%VBCC%%\bin\win32\vasmm68k_mot -Fhunk -phxass %s -o %s -I"%%VBCC%%\include\sdk"
+-rm=del /f %s
+-rmv=del /f %s
+-ld=%%VBCC%%\bin\win32\vlink -bamigahunk -x -Bstatic -Cvbcc -nostdlib -L"%%VBCC%%\lib" "%%VBCC%%\lib\startup.o" %s %s -lvc -o %s
+-l2=%%VBCC%%\bin\win32\vlink -bamigahunk -x -Bstatic -Cvbcc -nostdlib -L"%%VBCC%%\lib" %s %s -o %s
+-ldv=%%VBCC%%\bin\win32\vlink -bamigahunk -t -x -Bstatic -Cvbcc -nostdlib -L"%%VBCC%%\lib" "%%VBCC%%\lib\startup.o" %s %s -lvc -o %s
+-l2v=%%VBCC%%\bin\win32\vlink -bamigahunk -t -x -Bstatic -Cvbcc -nostdlib -L"%%VBCC%%\lib" %s %s -o %s
+-ldnodb=-s -Rshort
+-ul=-l%s
+-cf=-F%s
+-ml=500
+
+
