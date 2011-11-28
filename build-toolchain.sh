@@ -3,59 +3,58 @@
 TARGET_DIR=dist
 MAKE=make
 UNAME=`uname`
-BINPATH=$UNAME
-IS_WIN32=no
+CROSSGCC='i386-mingw32-gcc'
 
-if [ `echo "$UNAME" | sed 's/-[678]\.[0-9]$//'` = MINGW32_NT ]; then
-	BINPATH=win32
-	IS_WIN32=yes
-	MAKE=mingw32-make
-fi
-
-# Build VBCC using newlines to satisfy interactive prompts with default answers.
-# These defaults are OK for a x86 host.
-echo "Building vbcc.."
-$MAKE -C vbcc TARGET=m68k || exit 1
-
-# Build VASM
-echo "Building vasm.."
-$MAKE -C vasm CPU=m68k SYNTAX=mot || exit 1
-
-# Build VLINK
-echo "Building vlink.."
-$MAKE -C vlink || exit 1
-
-# We're still here, so now create a target dir.
+# Create a target dir.
 echo "Cleaning up old target dir"
 test -d $TARGET_DIR && rm -rf $TARGET_DIR
 
 echo "Creating target dir"
 mkdir -p $TARGET_DIR || exit 1
 
+BINDIR_HOST=$TARGET_DIR/bin/$UNAME
+BINDIR_WIN32=$TARGET_DIR/bin/win32
+
 mkdir $TARGET_DIR/bin || exit 1
-mkdir $TARGET_DIR/bin/$BINPATH || exit 1
+mkdir $BINDIR_HOST || exit 1
+mkdir $BINDIR_WIN32 || exit 1
 mkdir $TARGET_DIR/config || exit 1
 mkdir $TARGET_DIR/include || exit 1
 mkdir $TARGET_DIR/include/sdk || exit 1
 mkdir $TARGET_DIR/include/net || exit 1
 mkdir $TARGET_DIR/lib || exit 1
 
-echo "Copying vbcc binaries"
-cp vbcc/bin/vbccm68k $TARGET_DIR/bin/$BINPATH || exit 1
-cp vbcc/bin/vc $TARGET_DIR/bin/$BINPATH || exit 1
+# Build VBCC using newlines to satisfy interactive prompts with default answers.
+# These defaults are OK for a x86 host.
+echo "Building vbcc for host.."
+$MAKE -C vbcc TARGET=m68k clean all || exit 1
+mv vbcc/bin/vc vbcc/bin/vbccm68k $BINDIR_HOST || exit 1
 
-echo "Copying vasm binaries"
-cp vasm/vasmm68k_mot $TARGET_DIR/bin/$BINPATH || exit 1
-cp vasm/vobjdump $TARGET_DIR/bin/$BINPATH || exit 1
+echo "Building vbcc for windows.."
+$MAKE -C vbcc TARGET=m68k NCC='gcc' CC="$CROSSGCC -O2 -DHAVE_AOS4" EXESUF=.exe clean all || exit 1
+mv vbcc/bin/vc.exe vbcc/bin/vbccm68k.exe $BINDIR_WIN32 || exit 1
 
-echo "Copying vlink binary"
-cp vlink/vlink $TARGET_DIR/bin/$BINPATH || exit 1
+# Build VASM
+echo "Building vasm for host.."
+$MAKE -C vasm CPU=m68k SYNTAX=mot clean all || exit 1
+mv vasm/vobjdump vasm/vasmm68k_mot $BINDIR_HOST || exit 1
 
-if [ yes = $IS_WIN32 ]; then
-	cp vc.config.win32 $TARGET_DIR/config/vc.cfg || exit 1
-else
-	sed s/@UNAME@/$UNAME/ < vc.config > $TARGET_DIR/config/vc.config || exit 1
-fi
+echo "Building vasm for windows.."
+$MAKE -C vasm CPU=m68k SYNTAX=mot CC=$CROSSGCC clean all || exit 1
+mv vasm/vobjdump $BINDIR_WIN32/vobjdump.exe || exit 1
+mv vasm/vasmm68k_mot $BINDIR_WIN32/vasmm68k_mot.exe || exit 1
+
+# Build VLINK
+echo "Building vlink for host.."
+$MAKE -C vlink clean all || exit 1
+mv vlink/vlink $BINDIR_HOST || exit 1
+
+echo "Building vlink for windows.."
+$MAKE -C vlink clean all CC=$CROSSGCC LD=$CROSSGCC || exit 1
+mv vlink/vlink $BINDIR_WIN32/vlink.exe || exit 1
+
+cp vc.config.win32 $TARGET_DIR/config/vc.cfg || exit 1
+sed s/@UNAME@/$UNAME/ < vc.config > $TARGET_DIR/config/vc.config || exit 1
 
 echo "Setting up includes"
 cp -r sdkinclude/* $TARGET_DIR/include/sdk || exit 1
